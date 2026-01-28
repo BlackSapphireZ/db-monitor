@@ -26,7 +26,7 @@ export async function GET(
             columns,
         });
     } catch (error) {
-        console.error('Table data error:', error);
+        console.error('Table data error:', error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json(
             { error: error instanceof Error ? error.message : 'Failed to get table data' },
             { status: 500 }

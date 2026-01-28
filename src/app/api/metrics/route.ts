@@ -88,7 +88,7 @@ async function getServerMetrics() {
             source: 'local',
         };
     } catch (error) {
-        console.error('Metrics error:', error);
+        console.error('Metrics error:', error instanceof Error ? error.message : 'Unknown error');
         throw error;
     }
 }
@@ -121,7 +121,7 @@ export async function GET() {
             timestamp: new Date().toISOString(),
         });
     } catch (error) {
-        console.error('Metrics error:', error);
+        console.error('Metrics error:', error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json(
             { error: 'Failed to get server metrics' },
             { status: 500 }

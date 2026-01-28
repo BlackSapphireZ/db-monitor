@@ -32,7 +32,7 @@ export async function GET() {
 
         return NextResponse.json({ tables: tablesWithCounts });
     } catch (error) {
-        console.error('Tables error:', error);
+        console.error('Tables error:', error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json(
             { error: 'Failed to get tables' },
             { status: 500 }

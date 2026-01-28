@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         const result = await runSelectQuery(sql);
         return NextResponse.json(result);
     } catch (error) {
-        console.error('Query error:', error);
+        console.error('Query error:', error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json(
             { error: error instanceof Error ? error.message : 'Query failed' },
             { status: 500 }
