@@ -6,6 +6,10 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+// Metrics cache to reduce shell command overhead
+let metricsCache: { data: unknown; expiry: number } | null = null;
+const METRICS_CACHE_TTL = 5000; // 5 seconds
+
 async function getServerMetrics() {
     try {
         // Run commands locally (this app runs on the server being monitored)
@@ -99,13 +103,22 @@ export async function GET() {
     }
 
     try {
-        // Get server metrics and database stats
+        // Check cache first
+        if (metricsCache && Date.now() < metricsCache.expiry) {
+            return NextResponse.json({
+                ...(metricsCache.data as object),
+                cached: true,
+                timestamp: new Date().toISOString(),
+            });
+        }
+
+        // Get server metrics and database stats in parallel
         const [serverMetrics, dbStats] = await Promise.all([
             getServerMetrics(),
             getDatabaseStats(),
         ]);
 
-        return NextResponse.json({
+        const responseData = {
             ...serverMetrics,
             database: dbStats,
             server: {
@@ -118,6 +131,17 @@ export async function GET() {
                     transfer: '1 TB',
                 },
             },
+        };
+
+        // Cache the result
+        metricsCache = {
+            data: responseData,
+            expiry: Date.now() + METRICS_CACHE_TTL,
+        };
+
+        return NextResponse.json({
+            ...responseData,
+            cached: false,
             timestamp: new Date().toISOString(),
         });
     } catch (error) {

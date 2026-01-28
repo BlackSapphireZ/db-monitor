@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { getTableList, query } from '@/lib/db';
+import { getTableListWithCounts } from '@/lib/db';
 
 export async function GET() {
     if (!(await isAuthenticated())) {
@@ -8,29 +8,19 @@ export async function GET() {
     }
 
     try {
-        const tables = await getTableList();
+        // Single optimized query with caching - NO MORE N+1!
+        const tables = await getTableListWithCounts();
 
-        // Get row counts for each table
-        const tablesWithCounts = await Promise.all(
-            tables.map(async (table: { table_name: string; column_count: number }) => {
-                try {
-                    const result = await query(`SELECT COUNT(*) as count FROM "${table.table_name}"`);
-                    return {
-                        name: table.table_name,
-                        columns: parseInt(table.column_count as unknown as string),
-                        rows: parseInt(result.rows[0].count),
-                    };
-                } catch {
-                    return {
-                        name: table.table_name,
-                        columns: parseInt(table.column_count as unknown as string),
-                        rows: 0,
-                    };
-                }
-            })
-        );
+        const formattedTables = tables.map(table => ({
+            name: table.table_name,
+            columns: table.column_count,
+            rows: table.row_count,
+        }));
 
-        return NextResponse.json({ tables: tablesWithCounts });
+        // Sort by row count descending
+        formattedTables.sort((a, b) => b.rows - a.rows);
+
+        return NextResponse.json({ tables: formattedTables });
     } catch (error) {
         console.error('Tables error:', error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json(
