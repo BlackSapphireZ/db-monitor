@@ -234,19 +234,19 @@ function LargeChart({
     }, [data, timeRange]);
 
     return (
-        <div className="bg-[#111] rounded-lg p-5 border border-[#1a1a1a]">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
+        <div className="bg-[#111] rounded-lg p-4 lg:p-5 border border-[#1a1a1a]">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
                     <span className="text-sm font-medium text-white">{title}</span>
                     {/* Time Range Buttons */}
-                    <div className="flex gap-1 bg-[#0a0a0a] rounded-lg p-1">
+                    <div className="flex flex-wrap gap-1 bg-[#0a0a0a] rounded-lg p-1">
                         {TIME_RANGES.map(({ key, label }) => (
                             <button
                                 key={key}
                                 onClick={() => onTimeRangeChange(key)}
-                                className={`px-3 py-1.5 text-xs font-medium rounded transition ${timeRange === key
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a1a1a]'
+                                className={`px-3 py-2 lg:py-1.5 text-xs font-medium rounded transition min-h-[36px] lg:min-h-0 ${timeRange === key
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a1a1a]'
                                     }`}
                             >
                                 {label}
@@ -386,9 +386,9 @@ export default function DashboardPage() {
     const diskStatus = getStatus(metrics?.disk.usage || 0);
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-4 lg:space-y-5">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-xl font-semibold text-white">Server Overview</h1>
                     <p className="text-gray-600 text-sm mt-0.5">
@@ -410,8 +410,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Server Info */}
-            <div className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-lg p-4 border border-blue-800/30">
-                <div className="flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-lg p-3 lg:p-4 border border-blue-800/30">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
                             <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -433,8 +433,8 @@ export default function DashboardPage() {
                             </div>
                         )}
                         <div className={`px-3 py-1 rounded text-xs font-medium ${memStatus === 'normal' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                memStatus === 'warning' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                                    'bg-red-500/10 text-red-400 border border-red-500/20'
+                            memStatus === 'warning' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                                'bg-red-500/10 text-red-400 border border-red-500/20'
                             }`}>
                             {memStatus === 'normal' ? 'Healthy' : memStatus === 'warning' ? 'Warning' : 'Critical'}
                         </div>
@@ -443,7 +443,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Metrics Grid */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                 {/* CPU */}
                 <div className="bg-[#111] rounded-lg p-4 border border-[#1a1a1a]">
                     <div className="flex items-center justify-between mb-2">
@@ -518,7 +518,7 @@ export default function DashboardPage() {
             />
 
             {/* Bottom Section */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
                 {/* Database Stats */}
                 <div className="bg-[#111] rounded-lg p-4 border border-[#1a1a1a]">
                     <div className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-3">Database</div>
