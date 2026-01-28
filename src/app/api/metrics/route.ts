@@ -6,13 +6,10 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-const SSH_KEY = '~/.ssh/crisp_do_key';
-const SSH_HOST = 'root@206.189.36.199';
-
-async function getRemoteServerMetrics() {
+async function getServerMetrics() {
     try {
-        // Get CPU, Memory, Disk from remote server via SSH
-        const command = `ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${SSH_HOST} "
+        // Run commands locally (this app runs on the server being monitored)
+        const command = `
             echo '===CPU==='
             top -bn1 | head -5
             echo '===MEMORY==='
@@ -22,10 +19,10 @@ async function getRemoteServerMetrics() {
             echo '===UPTIME==='
             uptime
             echo '===NETWORK==='
-            cat /proc/net/dev | grep eth0
-        "`;
+            cat /proc/net/dev | grep eth0 || echo 'eth0: 0 0 0 0 0 0 0 0 0 0'
+        `;
 
-        const { stdout } = await execAsync(command, { timeout: 15000 });
+        const { stdout } = await execAsync(command, { timeout: 10000 });
 
         // Parse CPU
         const cpuMatch = stdout.match(/%Cpu.*?(\d+\.?\d*)\s*us.*?(\d+\.?\d*)\s*sy.*?(\d+\.?\d*)\s*ni.*?(\d+\.?\d*)\s*id/);
@@ -59,7 +56,7 @@ async function getRemoteServerMetrics() {
         const loadAvg = loadMatch ? parseFloat(loadMatch[1]) : 0;
 
         // Parse uptime duration
-        const uptimeMatch = stdout.match(/up\s+([\d]+\s+days?,?\s*)?([\d:]+)/);
+        const uptimeMatch = stdout.match(/up\s+([\d]+\s+days?,?\s*)?([:\d]+)/);
         let uptime = 'Unknown';
         if (uptimeMatch) {
             const days = uptimeMatch[1] ? uptimeMatch[1].trim() : '';
@@ -88,10 +85,10 @@ async function getRemoteServerMetrics() {
                 tx: Math.round(txBytes / 1024 / 1024),
             },
             uptime,
-            source: 'remote',
+            source: 'local',
         };
     } catch (error) {
-        console.error('SSH metrics error:', error);
+        console.error('Metrics error:', error);
         throw error;
     }
 }
@@ -102,9 +99,9 @@ export async function GET() {
     }
 
     try {
-        // Get remote server metrics and database stats
+        // Get server metrics and database stats
         const [serverMetrics, dbStats] = await Promise.all([
-            getRemoteServerMetrics(),
+            getServerMetrics(),
             getDatabaseStats(),
         ]);
 
