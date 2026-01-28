@@ -211,11 +211,11 @@ export default function TableDetailPage() {
     const rows = tableData?.data || [];
 
     // Count message types if this is the Message table
-    const typeCounts = tableName === 'Message' ? rows.reduce((acc, row) => {
+    const typeCounts = tableName === 'Message' ? rows.reduce<Record<string, number>>((acc, row) => {
         const type = String(row.type || 'unknown');
         acc[type] = (acc[type] || 0) + 1;
         return acc;
-    }, {} as Record<string, number>) : null;
+    }, {}) : null;
 
     return (
         <div className="space-y-4">
