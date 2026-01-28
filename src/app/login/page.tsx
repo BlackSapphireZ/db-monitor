@@ -29,7 +29,8 @@ export default function LoginPage() {
                 return;
             }
 
-            router.push('/dashboard');
+            // Use hard redirect to ensure cookie is properly sent
+            window.location.href = '/dashboard';
         } catch (err) {
             setError('Connection error');
         } finally {
