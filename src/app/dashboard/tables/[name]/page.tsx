@@ -32,7 +32,7 @@ function ImageModal({ url, name, onClose }: ImageModalProps) {
                 >
                     Close
                 </button>
-                <img src={url} alt={name} className="max-w-full max-h-[80vh] rounded-lg" />
+                <img src={url} alt={name} className="max-w-full max-h-[80vh] rounded-lg" loading="lazy" />
                 <div className="text-center mt-3 text-gray-500 text-xs">{name}</div>
             </div>
         </div>
@@ -61,6 +61,7 @@ function CellRenderer({ value, columnName, onImageClick }: {
                             src={parsed.url}
                             alt={parsed.name || 'Image'}
                             className="w-10 h-10 rounded object-cover cursor-pointer hover:opacity-80 transition"
+                            loading="lazy"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onImageClick(parsed.url, parsed.name || 'Image');
